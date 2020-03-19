@@ -1,0 +1,45 @@
+<div class="row">
+  <div class="col-lg-12">
+    <p>You are going to create a bpm case. Please, select a process and write a comment.</p>
+  </div>
+</div>
+<div class="row">
+  <div class="col-lg-12">
+    <div class="form-group">
+      <div>
+        <p class="notes"><label class="control-label">Process name</label></p>
+      </div>
+      <select [(ngModel)]="bpm_process_type" class="form-control m-b" name="process"
+              [disabled]="searchingBPMProcessTypes || bpm_process_types.length == 0">
+        <option *ngFor="let pt of bpm_process_types" [value]="pt">{{pt.processName}}</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <div>
+        <p class="notes"><label class="control-label">Comment</label></p>
+      </div>
+      <!--Notes-->
+      <textarea
+        [(ngModel)]="bpm_notes"
+        class="form-control notes-form no-resize"
+        placeholder="Enter your case description"
+        rows="3"
+        maxlength="250">
+      </textarea>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-lg-12">
+    <div class="form-group">
+      <button class="btn btn-primary margin-right" (click)="createBPMCase(false)" [disabled]="!account?.customer?.cifNo || !bpm_process_type || searchingBPMCases || waitingResponse">{{saveText}}
+        <waiting-backend *ngIf="waitingResponse"></waiting-backend>
+      </button>
+      <button *ngIf="showSave" class="btn margin-right" (click)="createBPMCase(true)" [disabled]="!account?.customer?.cifNo || !bpm_process_type || searchingBPMCases || waitingResponse">Save
+        <waiting-backend *ngIf="waitingResponse"></waiting-backend>
+      </button>
+      <button class="btn" [ngClass]="{'pull-right': showSave}" (click)="goToRecordCall()">Cancel
+      </button>
+    </div>
+  </div>
+</div>

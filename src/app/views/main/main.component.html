@@ -1,0 +1,42 @@
+<full-search
+  #fullSearch
+  [processStatuses]="processStatuses"
+  [followUpDues]="followUpDues"
+  [campaigns]="campaigns"
+  [statuses]="statuses"
+  [campaignCode]="campaignCode"
+  [currentServiceParams]="currentServiceParams"
+  [currentAccountServiceParams]="currentAccountServiceParams"
+  [currentCasesServiceParams]="currentCasesServiceParams"
+  [currentTaskServiceParams]="currentTaskServiceParams"
+  [currentProcessesServiceParams]="currentProcessesServiceParams"
+  [processes]="processes"
+  (onViewCL)="onClickViewCl($event)"
+  (onTab)="onTabChange($event)"
+  (onSearch)="onClickSearch($event)"
+  (onSearchProcess)="onClickProcessesCases($event)"
+  (onSearchTask)="onClickTaskInbox($event)"
+  (onSearchProcesses)="onClickProcessesList($event)">
+</full-search>
+
+<app-search
+  #search
+  [accountTypes]="accountTypes"
+  [nextCallCampaigns]="campaigns"
+  [nextCallStatuses]="statuses"
+  [currentTab]="currentTab"
+  [processes]="processes"
+  [currentServiceParams]="currentServiceParams"
+  [currentTaskServiceParams]="currentTaskServiceParams"
+  [currentAccountServiceParams]="currentAccountServiceParams"
+  [currentProcessesServiceParams]="currentProcessesServiceParams">
+</app-search>
+
+<manage-cases
+  #manageCases
+  [statuses]="processStatuses"
+  [followUpDues]="followUpDues"
+  [currentTab]="currentTab"
+  [currentCasesServiceParams]="currentCasesServiceParams"
+  [processes]="processes">
+</manage-cases>

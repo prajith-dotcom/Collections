@@ -1,0 +1,79 @@
+<ng-template #disasterModal let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Declared disasters</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <table class='table table-striped table-hover'>
+      <thead *ngIf="!hasOneDisaster()">
+      <tr>
+        <th>Name</th>
+        <th>Incident</th>
+        <th>Disaster</th>
+        <th>Begin Date</th>
+        <th>End Date</th>
+        <th></th>
+        <th></th>
+      </tr>
+      </thead>
+      <tbody>
+      <ng-container *ngFor="let disaster of disasters">
+        <tr>
+          <td><span [class.strong]="isCurrentDisaster(disaster) || hasOneDisaster()">{{disaster.title}}</span></td>
+          <td *ngIf="!hasOneDisaster()"><span *ngIf="!isCurrentDisaster(disaster)">{{disaster.incidentType}}</span></td>
+          <td *ngIf="!hasOneDisaster()"><span *ngIf="!isCurrentDisaster(disaster)">{{disaster.disasterType ? _disasterType[disaster.disasterType] : '-'}}</span></td>
+          <td *ngIf="!hasOneDisaster()"><span *ngIf="!isCurrentDisaster(disaster)">{{disaster.incidentBeginDate | coinDateTransform: "STD_DATE"}}</span></td>
+          <td *ngIf="!hasOneDisaster()">
+            <span *ngIf="!isCurrentDisaster(disaster)">
+              {{disaster.incidentEndDate ? (disaster.incidentEndDate | coinDateTransform: "STD_DATE") : '--'}}
+            </span>
+          </td>
+          <td *ngIf="!hasOneDisaster()">
+            <button (click)="toggleExpandDisaster(disaster); $event.stopPropagation()"
+                    [class.blue]="isCurrentDisaster(disaster)" class="btn btn-xs btn-white btnBorder">
+              <i class="pointer fa"
+                 [class.fa-chevron-down]="!isCurrentDisaster(disaster)"
+                 [class.fa-chevron-up]="isCurrentDisaster(disaster)">
+              </i>
+            </button>
+          </td>
+          <td>
+            <a target="_blank" rel="noopener noreferrer" [href]="'https://www.fema.gov/disaster/' + disaster.disasterNumber" style="float: right">
+              <i class="fas fa-external-link-alt" title="More details"></i>
+            </a>
+          </td>
+        </tr>
+        <tr *ngIf="isCurrentDisaster(disaster) || hasOneDisaster()">
+          <td colspan="10" class="col-padding white">
+            <div class="box-shadow box-padding col-lg-12" style="padding-top: 10px">
+              <div class="col-lg-6">
+                <dl class="dl-horizontal">
+                  <dt>Disaster number:</dt><dd>{{disaster.disasterNumber}}</dd>
+                  <dt>Disaster type:</dt><dd>{{disaster.disasterType ? _disasterType[disaster.disasterType] : '-'}}</dd>
+                  <dt>Incident type:</dt><dd>{{disaster.incidentType}}</dd>
+                  <dt>State:</dt><dd>{{disaster.state}}</dd>
+                  <dt>Postal code:</dt><dd>{{disaster.placeCode}}</dd>
+                </dl>
+              </div>
+              <div class="col-lg-6">
+                <dl class="dl-horizontal">
+                  <dt>County area:</dt><dd>{{disaster.declaredCountyArea}}</dd>
+                  <dt>Begin date:</dt><dd>{{disaster.incidentBeginDate | coinDateTransform: "STD_DATE"}}</dd>
+                  <dt>End date:</dt><dd>{{disaster.incidentEndDate ? (disaster.incidentEndDate | coinDateTransform: "STD_DATE") : '--'}}</dd>
+                  <dt>Disaster close out:</dt>
+                  <dd>{{disaster.disasterCloseOutDate ? (disaster.disasterCloseOutDate | coinDateTransform: "STD_DATE") : '--'}}</dd>
+                </dl>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </ng-container>
+      </tbody>
+    </table>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class=" pull-left btn btn-outline-dark" (click)="c('Close click')">Close</button>
+  </div>
+</ng-template>

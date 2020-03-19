@@ -1,0 +1,32 @@
+.create{
+  cursor: pointer;
+}
+
+.orange{
+  color: orange;
+}
+
+.close:focus{
+  outline: none;
+}
+
+.red-row {
+  background-color: rgba(255, 0, 0, 0.14) !important;
+}
+
+.red-row td {
+  border-top: 1px solid rgb(255, 0, 0);
+  border-bottom: 1px solid rgb(255, 0, 0);
+}
+
+.red-row td:first-child {
+  border-left: 1px solid rgb(255, 0, 0);
+}
+
+.red-row td:last-child {
+  border-right: 1px solid rgb(255, 0, 0);
+}
+
+.table-responsive {
+  overflow-x: inherit;
+}

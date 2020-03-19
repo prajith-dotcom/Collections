@@ -1,0 +1,78 @@
+<div *ngIf="searching" class="search"><waiting-backend></waiting-backend>Searching...</div>
+<div *ngIf="taskList && taskList.length == 0 && !searching">No tasks found</div>
+<div *ngIf="taskList && taskList.length > 0">
+  <div class="table-responsive">
+
+    <table class="clAccounts table table-striped">
+      <thead>
+      <tr>
+        <th></th>
+        <th class="cursor"
+            (click)="sortTable(currentTaskServiceParams.currentParams.WithOwner ? 'id' : 'processInstanceId')">
+          Id
+          <header-sorter
+            [currentSortType]="sort.sortType"
+            [field]="currentTaskServiceParams.currentParams.WithOwner ? 'id' : 'processInstanceId'"
+            [isDesc]="sort.isDesc">
+          </header-sorter>
+        </th>
+        <th class="cursor"
+            (click)="sortTable('name')">
+          Task
+          <header-sorter
+            [currentSortType]="sort.sortType"
+            [field]="'name'"
+            [isDesc]="sort.isDesc">
+          </header-sorter>
+        </th>
+        <th style="">Process</th>
+        <th class="cursor"
+            (click)="sortTable('expirationTime')">
+          Due on
+          <header-sorter
+            [currentSortType]="sort.sortType"
+            [field]="'expirationTime'"
+            [isDesc]="sort.isDesc">
+          </header-sorter>
+        </th>
+        <th>Account number</th>
+        <th>Type</th>
+        <th>Customer</th>
+        <th>CIFNO</th>
+        <th></th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let t of taskList">
+        <td style="width: 65px">
+          <button class="buttonGo btn btn-xs btn-primary" (click)="goToAccount(t)" *ngIf="t.account">Go</button>
+        </td>
+        <td>{{t.taskProcessInstanceId}}</td>
+        <td>{{t.taskName}}</td>
+        <td>{{t.account?.processCase?.processName ? t.account?.processCase?.processName : t.taskProcessDefinitionId}}</td>
+        <td>{{t.taskExpirationTime | coinDateTransform}}</td>
+        <td>{{t.account?.accountId}}</td>
+        <td>{{t.account?.accountType}}</td>
+        <td>{{t.account?.customer?.mainContact?.completeName}}</td>
+        <td>{{t.account?.customer?.cifNo}}</td>
+        <td>
+          <i *ngIf="t != null && t.account?.processCase?.note != null && t.account?.processCase?.note != ''"
+               class="fa fa-info-circle"
+               style="font-size:1.2em;"
+               [popover]="popDesc"
+               outsideClick="false"
+               triggers="mouseenter: mouseleave"
+               placement="right"
+          ></i>
+        </td>
+
+        <ng-template #popDesc>
+          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 10px"><strong>Comment:</strong> {{t.account?.processCase?.note}}</div>
+        </ng-template>
+      </tr>
+
+      </tbody>
+    </table>
+
+  </div>
+</div>

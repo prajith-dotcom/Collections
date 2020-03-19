@@ -1,0 +1,57 @@
+<div *ngIf="searching" class="search"><waiting-backend></waiting-backend>Searching...</div>
+<div *ngIf="processesList && processesList.length == 0 && !searching">No tasks found</div>
+<div *ngIf="processesList && processesList.length > 0">
+  <div class="table-responsive">
+
+    <table class="clAccounts table table-striped">
+      <thead>
+      <tr>
+        <th></th>
+        <th class="cursor"
+            (click)="sortTable('id')">
+          Id
+          <header-sorter
+            [currentSortType]="sort.sortType"
+            [field]="'id'"
+            [isDesc]="sort.isDesc">
+          </header-sorter>
+        </th>
+        <th>Name</th>
+        <th>Version</th>
+        <th>State</th>
+        <th class="cursor"
+            (click)="sortTable('start')">
+          Created
+          <header-sorter
+            [currentSortType]="sort.sortType"
+            [field]="'start'"
+            [isDesc]="sort.isDesc">
+          </header-sorter>
+        </th>
+        <th>Account number</th>
+        <th>Type</th>
+        <th>Customer</th>
+        <th>CIFNO</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let p of processesList">
+        <td style="width: 65px">
+          <button class="buttonGo btn btn-xs btn-primary" (click)="goToAccount(p)" *ngIf="p.account">Go</button>
+        </td>
+        <td>{{p.processInstanceId}}</td>
+        <td>{{p.processName}}</td>
+        <td>{{p.processVersion}}</td>
+        <td>{{getProcessState(p.processInstanceState)}}</td>
+        <td>{{p.startDate | coinDateTransform}} <strong class="black">({{p.startDate | dateAgoTransform}})</strong></td>
+        <td>{{p.account?.accountId}}</td>
+        <td>{{p.account?.accountType}}</td>
+        <td>{{p.account?.customer?.mainContact?.completeName}}</td>
+        <td>{{p.account?.customer?.cifNo}}</td>
+      </tr>
+
+      </tbody>
+    </table>
+
+  </div>
+</div>

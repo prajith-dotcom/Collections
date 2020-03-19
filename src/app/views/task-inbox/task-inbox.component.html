@@ -1,0 +1,11 @@
+<ng-container>
+  <form style="padding-top: 25px">
+    <label style="vertical-align: bottom" [ngClass]="{'not-selected': !params.WithOwner}">My tasks</label>
+    <label class="switch" (click)="search(!params.WithOwner); $event.preventDefault()">
+      <input type="checkbox" [checked]="params.WithoutOwner">
+      <span class="slider round"></span>
+    </label>
+    <label style="vertical-align: bottom" [ngClass]="{'not-selected': !params.WithoutOwner}">Group tasks</label>
+  </form>
+</ng-container>
+<div class="row"></div>

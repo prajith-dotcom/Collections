@@ -1,0 +1,532 @@
+<!--Popovers-->
+<ng-template #popBasic><small>Ctrl+Shift+</small><strong>{{keyCodes.accBasic.letter}}</strong></ng-template>
+<ng-template #popCollection><small>Ctrl+Shift+</small><strong>{{keyCodes.accCollection.letter}}</strong></ng-template>
+<ng-template #popLoan><small>Ctrl+Shift+</small><strong>{{keyCodes.accLoan.letter}}</strong></ng-template>
+<ng-template #popLossMitigation><small>Ctrl+Shift+</small><strong>{{keyCodes.accLossMitigation.letter}}</strong></ng-template>
+<ng-template #popBankruptcy><small>Ctrl+Shift+</small><strong>{{keyCodes.accBankruptcy.letter}}</strong></ng-template>
+<ng-template #popForeclosure><small>Ctrl+Shift+</small><strong>{{keyCodes.accForeclosure.letter}}</strong></ng-template>
+<ng-template #popAdditional><small>Ctrl+Shift+</small><strong>{{keyCodes.accAddtitional.letter}}</strong></ng-template>
+<ng-template #popHistory><small>Ctrl+Shift+</small><strong>{{keyCodes.accHistory.letter}}</strong></ng-template>
+
+<ng-template #popAccounts><small>Ctrl+Shift+</small><strong>{{keyCodes.addAccounts.letter}}</strong></ng-template>
+<ng-template #popCoborrowers><small>Ctrl+Shift+</small><strong>{{keyCodes.addCoborrowers.letter}}</strong></ng-template>
+
+<ng-template #popCalls><small>Ctrl+Shift+</small><strong>{{keyCodes.ctCalls.letter}}</strong></ng-template>
+<ng-template #popNotes><small>Ctrl+Shift+</small><strong>{{keyCodes.ctNotes.letter}}</strong></ng-template>
+<ng-template #popAlerts><small>Ctrl+Shift+</small><strong>{{keyCodes.ctAlerts.letter}}</strong></ng-template>
+
+<ng-template #newCallToggle><small>Ctrl+Shift+</small><strong>{{keyCodes.toggleNewCall.letter}}</strong></ng-template>
+
+<div class="row">
+  <div class="col-lg-7">
+    <div class="ibox">
+      <div class="ibox-title">
+        <div class="row">
+          <div class="col-lg-4">
+            <h5>Customer Details And <span *ngIf="!isDepositAccountType && !isSavingsAccountType">Loan</span>
+              <span *ngIf="isDepositAccountType || isSavingsAccountType">Deposit</span> Info
+            </h5>
+          </div>
+          <div class="col-lg-7">
+            <div class="row" *ngIf="isCustomerInDisaster">
+              <div class="col-lg-12">
+                <h5 class="red disaster-title" (click)="openDisasterModal()" title="View all disasters">
+                  Zip code possibly affected by declared disasters
+                  <i class="fa fa-info-circle"></i>
+                </h5>
+                <disaster-modal #disasterModal [disasters]="customerDisasters"></disaster-modal>
+              </div>
+            </div>
+            <div class="row" *ngIf="isSavingsAccountType">
+              <div class="col-lg-12">
+                <h5 class="red">
+                  Savings account - do not offer fresh start
+                </h5>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-1">
+            <iboxtools></iboxtools>
+          </div>
+        </div>
+      </div>
+      <div class="ibox-content" *ngIf="!searchingAccountInfo">
+        <div id="container" class="row">
+          <div class="col-lg-12">
+            <ngb-tabset #tabSetAccount>
+
+              <ngb-tab id="accountBasic">
+                <ng-template ngbTabTitle><span [popover]="popBasic" triggers="">Basic</span></ng-template>
+                <ng-template ngbTabContent>
+                  <p></p>
+                  <customer-detail [customer]="account?.customer"
+                                   [account]="account"
+                                   [searching]="searchingCustomer"
+                                   [searchingSSN]="searchingCoborrowers"
+                                   [searchingAccountDepInfo]="searchingAccountDepInfo"
+                                   (onCall)="makeCall($event)">
+                  </customer-detail>
+                </ng-template>
+              </ngb-tab>
+
+              <ngb-tab id="accountCollection" *ngIf="!isDepositAccountType && !isSavingsAccountType">
+                <ng-template ngbTabTitle>
+                  <span id="collection" [popover]="popCollection" placement="bottom" triggers="">Collection <notification-tab *ngIf="isNotifyActive()" [accountCol]="account?.collection"></notification-tab></span></ng-template>
+                <ng-template ngbTabContent>
+                  <p></p>
+                  <account-collection
+                    [isMemo]="memoInText"
+                    [accountCol]="account?.collection"
+                    (onHide)="showIcon(false)">
+                  </account-collection>
+                </ng-template>
+              </ngb-tab>
+
+              <ngb-tab id="accountLoan" *ngIf="!isDepositAccountType && !isSavingsAccountType">
+                <ng-template ngbTabTitle><span [popover]="popLoan" triggers="">Loan</span></ng-template>
+                <ng-template ngbTabContent>
+                  <p></p>
+                  <account-loan
+                    [accountLoan]="account?.loan">
+                  </account-loan>
+                </ng-template>
+              </ngb-tab>
+
+              <ngb-tab  id="accountLossMitigation" *ngIf="!isDepositAccountType && !isSavingsAccountType">
+                <ng-template ngbTabTitle><span [popover]="popLossMitigation" placement="bottom" triggers="">Loss mitigation</span></ng-template>
+                <ng-template ngbTabContent>
+                  <p></p>
+                  <account-loss-mitigation [accountLoss]="account?.lossMitigation"></account-loss-mitigation>
+                </ng-template>
+              </ngb-tab>
+
+              <ngb-tab id="accountBankruptcy" *ngIf="!isDepositAccountType && !isSavingsAccountType">
+                <ng-template ngbTabTitle><span [popover]="popBankruptcy" triggers="">Bankruptcy</span></ng-template>
+                <ng-template ngbTabContent>
+                  <p></p>
+                  <account-bakruptcy [accountBankrup]="account?.bankruptcy"></account-bakruptcy>
+                </ng-template>
+              </ngb-tab>
+
+              <ngb-tab id="accountForeclosure" *ngIf="!isDepositAccountType && !isSavingsAccountType">
+                <ng-template ngbTabTitle><span [popover]="popForeclosure" placement="bottom" triggers="">Foreclosure</span></ng-template>
+                <ng-template ngbTabContent>
+                  <p></p>
+                  <account-foreclosure [accountFore]="account?.foreclosure"></account-foreclosure>
+                </ng-template>
+              </ngb-tab>
+
+              <ngb-tab  id="accountAdditional" *ngIf="!isDepositAccountType && !isSavingsAccountType">
+                <ng-template ngbTabTitle><span [popover]="popAdditional" triggers="">Additional</span></ng-template>
+                <ng-template ngbTabContent>
+                  <p></p>
+                  <account-additional-info [accountAdditional]="account?.additionalInfo"></account-additional-info>
+                </ng-template>
+              </ngb-tab>
+
+              <ngb-tab id="accountHistory">
+                <ng-template ngbTabTitle><span [popover]="popHistory" placement="bottom" triggers="">History</span></ng-template>
+                <ng-template ngbTabContent>
+                  <p></p>
+                  <account-history
+                    [accountType]="account?.accountType"
+                    [history]="account?.history"
+                    [searching]="searchingAccountHistory">
+                  </account-history>
+                </ng-template>
+              </ngb-tab>
+
+            </ngb-tabset>
+
+          </div>
+        </div>
+
+      </div>
+      <div class="ibox-content" *ngIf="searchingAccountInfo">
+        <waiting-backend></waiting-backend>
+        Searching for account...
+      </div>
+    </div>
+
+    <div class="ibox">
+      <div class="ibox-title" id="relatedInfo">
+        <h5>Related Info</h5>
+        <iboxtools style="color: white;"></iboxtools>
+      </div>
+      <div class="ibox-content">
+        <div class="row">
+          <div class="col-lg-12">
+            <ngb-tabset #tabSetAdditional>
+              <ngb-tab id="additionalAccounts">
+                <ng-template ngbTabTitle>
+                  <span [popover]="popAccounts"
+                        triggers="">Related accounts <tab-counter [data]="account?.customer?.accounts"
+                                                                  [searching]="searchingAccounts"></tab-counter>
+                    <notification-tab *ngIf="accountHasPastDueDays()"></notification-tab>
+                  </span>
+                </ng-template>
+                <ng-template ngbTabContent>
+                  <p></p>
+                  <accounts-table #additionalAccounts
+                                  [hasToSaveParams]="false"
+                                  [hasCreateButton]="false"
+                                  [accounts]="account?.customer?.accounts"
+                                  [searching]="searchingAccounts"
+                                  [excluded]="account"
+                                  (onHide)="showDaysDueNotify(false)">
+                  </accounts-table>
+                </ng-template>
+              </ngb-tab>
+              <ngb-tab id="additionalCoBorrowers">
+                <ng-template ngbTabTitle>
+                  <span [popover]="popCoborrowers"
+                        triggers="">Co-borrowers <tab-counter [data]="account?.customer?.coBorrowers"
+                                                              [searching]="searchingCoborrowers">
+                  </tab-counter>
+                  </span>
+                </ng-template>
+                <ng-template ngbTabContent>
+                  <p></p>
+                  <customers-table (onCall)="makeCall($event)"
+                                   [customers]="account?.customer?.coBorrowers"
+                                   [searching]="searchingCoborrowers">
+                  </customers-table>
+                </ng-template>
+              </ngb-tab>
+
+              <ngb-tab [id]="(processCases && processCases.length) > 0 &&  hasNotAllClosedCases ? 'additionalCases' : 'noAdd'" *ngIf="canShowTicklerProcesses">
+                <ng-template ngbTabTitle><span>Cases <tab-counter [data]="processCases" [searching]="searchingProcessCases"></tab-counter></span></ng-template>
+                <ng-template ngbTabContent>
+                  <p></p>
+
+                 <tickler-cases-table
+                   [searchingProcessCases]="searchingProcessCases"
+                   [account]="account"
+                   [isInRelatedInfo]="true"
+                   [ticklerProcessCases]="processCases"
+                   [processCase]="currentProcessCase"
+                   (onSearchCases)="loadCaseTicklers($event)"
+                 ></tickler-cases-table>
+
+                  <ng-container *ngIf="currentProcessCase != null">
+                    <div class="ibox-title case-title">
+                      <h3>Case <strong>{{currentProcessCase.id}} {{currentProcessCase.processCode}}</strong></h3>
+                    </div>
+                    <div class="ibox-content">
+                      <div class="row">
+                        <div class="col-lg-9">
+                          <h3 class="title2 text-success">Ticklers</h3>
+                        </div>
+                        <div class="col-lg-3">
+                          <button *ngIf="canCreateTicklerCase"
+                            class="btn btn-sm btn-primary pull-right"
+                                  [disabled]="isCreating || searchingCaseTicklers" (click)="onNewTickler()">
+                            <i class="fa fa-file-o"></i> New
+                          </button>
+                          <paginator id="pagination" [data]="processCaseTicklers"
+                                     (onPageChange)="incPage($event)"
+                                     [pagination]="pagination"
+                                     [disabled]="isCreating || searchingCaseTicklers"
+                                     [hasNewSize]="true">
+                          </paginator>
+                        </div>
+                      </div>
+
+                      <process-case-tickler-table
+                        [isCreating]="isCreating"
+                        [ticklerTypes]="ticklerTypes"
+                        [currentProcessCase]="currentProcessCase"
+                        [processCaseTicklers]="processCaseTicklers"
+                        [searchingCaseTicklers]="searchingCaseTicklers"
+                        [isAccountPage]="true"
+                        [account]="account"
+                        (onAddTicklerCase)="refreshCaseTicklers()"
+                        (onCancel)="onCancel()"
+                        (onDeleteTicklerCase)="refreshCaseTicklers()"
+                      ></process-case-tickler-table>
+
+                      <div *ngIf="currentProcessCase.caseDescription != null && currentProcessCase.caseDescription != '' && !searchingCaseTicklers">
+                        <h3 class="title2 text-success">Description</h3>
+                        <span>{{currentProcessCase.caseDescription}}</span>
+                      </div>
+
+                    </div>
+                  </ng-container>
+                </ng-template>
+              </ngb-tab>
+
+              <ngb-tab id="bpmCases">
+                <ng-template ngbTabTitle><span>BPM Cases <tab-counter [data]="bpmCases" [searching]="searchingBPMCases"></tab-counter></span></ng-template>
+                <ng-template ngbTabContent>
+                  <p></p>
+                  <!--<h3>Current cases</h3>-->
+                  <div class='table-responsive'>
+                    <div *ngIf="searchingBPMCases" class="search">
+                      <waiting-backend></waiting-backend>
+                      Searching...
+                    </div>
+                    <p *ngIf="bpmCases && bpmCases.length === 0 && !searchingBPMCases">No cases found.</p>
+
+                    <table *ngIf="bpmCases && bpmCases.length > 0 && !searchingBPMCases" class='table table-hover'>
+                      <thead>
+                      <tr>
+                        <th></th>
+                        <th>Id</th>
+                        <th>Process</th>
+                        <th>Version</th>
+                        <th>By</th>
+                        <th>Date</th>
+                        <th></th>
+                      </tr>
+                      </thead>
+                      <tbody class="pointer-cursor">
+                      <tr *ngFor="let pc of bpmCases"
+                          (click)="selectCurrentBPMCase(pc)"
+                          [class.ui-state-highlight]="pc.id == currentBPMCase?.id">
+                        <td>
+                          <i *ngIf="pc.id == currentBPMCase?.id"
+                             class="fa fa-arrow-circle-right text-navy"
+                             style="font-size:1.2em;"
+                          ></i>
+                        </td>
+                        <td>{{pc.processInstanceId}}</td>
+                        <td>{{pc.processName}}</td>
+                        <td>{{pc.processVersion}}</td>
+                        <td>{{pc.createdBy}}</td>
+                        <td>{{pc.createdDt | coinDateTransform}}</td>
+                        <td>
+                          <i *ngIf="pc != null && pc.note != null && pc.note != ''"
+                             class="fa fa-info-circle"
+                             style="font-size:1.2em;"
+                             [popover]="popDesc"
+                             outsideClick="false"
+                             triggers="mouseenter: mouseleave"
+                             placement="right"
+                          ></i>
+                        </td>
+
+                        <ng-template #popDesc>
+                          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 10px"><strong>Comment:</strong> {{pc.note}}</div>
+                          <div *ngIf="pc.abortNote && pc.abortNote != ''" class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding: 10px"><strong>Abort comment:</strong> {{pc.abortNote}}</div>
+                        </ng-template>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <process-instance
+                    *ngIf="currentBPMCase != null"
+                    [bpmCase]="currentBPMCase"
+                    (onAborted)="loadBpmCases(true, true)"
+                  ></process-instance>
+                </ng-template>
+              </ngb-tab>
+            </ngb-tabset>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="ibox">
+      <div class="ibox-title">
+        <!--dynamic title-->
+        <h5>{{resultModeText}}</h5>
+        <iboxtools #newCall [popover]="newCallToggle" triggers=""></iboxtools>
+      </div>
+      <div class="ibox-content">
+        <div>
+          <p></p>
+          <new-call-record
+            #newCallRecord
+            [hidden]="resultsMode !== NEW_RECORD_MODE"
+            [showCallLater]="isCampaignRecordCall"
+            [isAutoDial]="isAutoDial"
+            [call]="lastOrCurrentCall"
+            [callState]="lastOrCurrentCall?.state"
+            [callFromUIType]="callingFromUIType"
+            [callingFromUIIsCoBorrower]="callingFromUIIsCoBorrower"
+            [account]="account"
+            (onSave)="recordCall($event)"
+            (onCancelMode)="cancelCallRecordMode()"
+            (onCreateProcessMode)="createProcessMode()"
+            (onCreateBPMProcessMode)="createBPMProcessMode()"
+            (onOpenRequest)="openNewCall()">
+          </new-call-record>
+          <!--cases-->
+          <new-process-case
+            [hidden]="resultsMode !== NEW_PROCESS_MODE"
+            [processes]="processes"
+            [account]="account"
+            [customer]="account?.customer"
+            saveText="Save and quit"
+            [showSave]="true"
+            (onDefaultCaseCreated)="reloadCasesList($event)"
+            (caseCreated)="processCaseCreated()"
+            (onCancel)="newCallRecordMode()">
+          </new-process-case>
+          <!--BPM cases-->
+          <new-bpm-process-case
+            [hidden]="resultsMode !== NEW_BPM_PROCESS_MODE"
+            [account]="account"
+            saveText="Save and quit"
+            [showSave]="true"
+            (onDefaultCaseCreated)="reloadBMPCasesList()"
+            (caseCreated)="processCaseCreated()"
+            (onCancel)="newCallRecordMode()">
+          </new-bpm-process-case>
+          <!--cancel call record-->
+          <cancel-call-record
+            [hidden]="resultsMode !== CANCEL_CALL_MODE"
+            [cancelReasons]="cancelReasons"
+            [waitingResponse]="waitingResponse"
+            (cancelCall)="cancelCall($event)"
+            (onCancel)="newCallRecordMode()">
+          </cancel-call-record>
+        </div>
+      </div>
+    </div>
+
+    <div class="ibox">
+      <div class="ibox-title">
+        <h5>Customer Data Verification</h5>
+        <i class="fas fa-exclamation-circle text-danger padding-icon size-icon"
+           *ngIf="showNotValidVerification()"></i>
+        <i class="fas fa-check-circle text-navy padding-icon size-icon"
+           *ngIf="showNeedsVerification()"></i>
+        <iboxtools #customerData></iboxtools>
+        <div *ngIf="loadingCustomerData" class="pull-right searchingContacts"><waiting-backend></waiting-backend> Loading...</div>
+      </div>
+      <div class="ibox-content">
+        <div class="row m-b">
+          <div class="col-lg-12">
+            <select class="form-control" [(ngModel)]=customerToVerify>
+              <option [ngValue]="account?.customer" [class]="getTextColor(account?.customer)">
+                {{ account?.customer?.mainContact?.completeName }}
+                <span *ngIf="showNotValidVerification(account?.customer)">&#xf06a;</span>
+                <span *ngIf="showNeedsVerification(account?.customer)">&#xf058;</span>
+              </option>
+              <option *ngFor="let co of account?.customer?.coBorrowers" [ngValue]="co" [class]="getTextColor(co)">
+                {{ co.mainContact.completeName }}
+                <span *ngIf="showNotValidVerification(co)">&#xf06a;</span>
+                <span *ngIf="showNeedsVerification(co)">&#xf058;</span>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-12">
+            <ngb-tabset>
+              <ngb-tab>
+                <ng-template ngbTabTitle>
+                  <span [popover]="popBasic" triggers="">Address</span>
+                  <i class="fas fa-exclamation-circle text-danger padding-icon size-icon"
+                     *ngIf="!customerToVerify?.hasValidAddressVerification() && !customerToVerify?.addressIsModifying() && !loadingCustomerData"></i>
+                  <i class="fas fa-check-circle text-navy padding-icon size-icon"
+                     *ngIf="customerToVerify?.addressIsModifying() && customerToVerify?.addressesAreEqual() && !loadingCustomerData"></i>
+                  <i class="fas fa-clock text-warning padding-icon size-icon"
+                     *ngIf="customerToVerify?.addressIsModifying() && !customerToVerify?.addressesAreEqual() && !loadingCustomerData"></i>
+                  <waiting-backend class="padding-icon size-icon" *ngIf="loadingCustomerData"></waiting-backend>
+                </ng-template>
+                <ng-template ngbTabContent>
+                  <p></p>
+                  <customer-address-modal *ngIf="!loadingCustomerData" [customer]="customerToVerify"></customer-address-modal>
+                </ng-template>
+              </ngb-tab>
+              <ngb-tab>
+                <ng-template ngbTabTitle>
+                  <span [popover]="popCollection" triggers="">Phone</span>
+                  <i class="fas fa-exclamation-circle text-danger padding-icon size-icon"
+                     *ngIf="!customerToVerify?.hasValidPhoneVerification() && !customerToVerify?.phoneIsModifying() && !loadingCustomerData"></i>
+                  <i class="fas fa-check-circle text-navy padding-icon size-icon"
+                     *ngIf="customerToVerify?.phoneIsModifying() && customerToVerify?.phonesAreEqual() && !loadingCustomerData"></i>
+                  <i class="fas fa-clock text-warning padding-icon size-icon"
+                     *ngIf="customerToVerify?.phoneIsModifying() && !customerToVerify?.phonesAreEqual() && !loadingCustomerData"></i>
+                  <waiting-backend class="padding-icon size-icon" *ngIf="loadingCustomerData"></waiting-backend>
+                </ng-template>
+                <ng-template ngbTabContent>
+                  <p></p>
+                  <customer-phone-modal *ngIf="!loadingCustomerData" [customer]="customerToVerify"></customer-phone-modal>
+                </ng-template>
+              </ngb-tab>
+              <ngb-tab>
+                <ng-template ngbTabTitle>
+                  <span [popover]="popLoan" triggers="">eMail</span>
+                  <i class="fas fa-exclamation-circle text-danger padding-icon size-icon"
+                     *ngIf="!customerToVerify?.hasValidEmailVerification() && !customerToVerify?.emailIsModifying() && !loadingCustomerData"></i>
+                  <i class="fas fa-check-circle text-navy padding-icon size-icon"
+                     *ngIf="customerToVerify?.emailIsModifying() && customerToVerify?.emailsAreEqual() && !loadingCustomerData"></i>
+                  <i class="fas fa-clock text-warning padding-icon size-icon"
+                     *ngIf="customerToVerify?.emailIsModifying() && !customerToVerify?.emailsAreEqual() && !loadingCustomerData"></i>
+                  <waiting-backend class="padding-icon size-icon" *ngIf="loadingCustomerData"></waiting-backend>
+                </ng-template>
+                <ng-template ngbTabContent>
+                  <p></p>
+                  <customer-email-modal *ngIf="!loadingCustomerData" [customer]="customerToVerify"></customer-email-modal>
+                </ng-template>
+              </ngb-tab>
+            </ngb-tabset>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ibox">
+      <div class="ibox-title">
+        <h5>Previous Contacts</h5>
+        <iboxtools></iboxtools>
+        <span *ngIf="!searchingTodayContacts" class="pull-right todayContacts" [class.red]="account?.customer?.todayContacts >= 6"> Attempts today:
+          <span>{{account?.customer?.todayContacts}}</span>
+        </span>
+        <div *ngIf="searchingTodayContacts" class="pull-right searchingContacts"><waiting-backend></waiting-backend> Searching...</div>
+      </div>
+      <div class="ibox-content">
+        <div id="ct" class="row">
+          <div class="col-lg-12">
+            <ngb-tabset #tabSetContacts>
+              <ngb-tab id="contactsCalls">
+                <ng-template ngbTabTitle><span [popover]="popCalls" triggers="">Calls <tab-counter [data]="account?.customer?.callRecords" [searching]="searchingCalls"></tab-counter></span></ng-template>
+                <ng-template ngbTabContent>
+                  <p></p>
+                  <customer-call-records [searching]="searchingCalls" [records]="account?.customer?.callRecords"></customer-call-records>
+                </ng-template>
+              </ngb-tab>
+              <ngb-tab id="contactsNotes">
+                <ng-template ngbTabTitle><span [popover]="popNotes" triggers="">Notes <tab-counter [data]="account?.customer?.notes" [searching]="searchingNotes"></tab-counter></span></ng-template>
+                <ng-template ngbTabContent>
+                  <p></p>
+                  <customer-notes [searching]="searchingNotes" [notes]="account?.customer?.notes"></customer-notes>
+                </ng-template>
+              </ngb-tab>
+              <ngb-tab id="contactsAlerts">
+                <ng-template ngbTabTitle><span [popover]="popAlerts" triggers="">Alerts <tab-counter [data]="account?.customer?.alerts" [searching]="searchingAlerts"></tab-counter></span></ng-template>
+                <ng-template ngbTabContent>
+                  <p></p>
+                  <customer-notes [searching]="searchingAlerts" [notes]="account?.customer?.alerts" [isEditable]="true" (onRefreshAlerts)="getCustomerAlertsRefresh()"></customer-notes>
+                </ng-template>
+              </ngb-tab>
+              <ngb-tab id="callNotes">
+                <ng-template ngbTabTitle>Memo notes <tab-counter [data]="currentMemoNotes" [searching]="searchingCallNotes"></tab-counter></ng-template>
+                <ng-template ngbTabContent>
+                  <p></p>
+                  <call-notes
+                    [isByAccount]="isByAccount"
+                    [account]="account"
+                    [memoNotes]="account?.customer?.callNotes"
+                    [searchingCallNotes]="searchingCallNotes"
+                    (onRefreshMemoNotes)="refreshMemoNotes()"
+                    (onRefreshFilter)="refreshMemoNotesFilter($event)">
+                  </call-notes>
+                </ng-template>
+              </ngb-tab>
+            </ngb-tabset>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+

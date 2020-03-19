@@ -1,0 +1,35 @@
+<div class="row">
+  <div class="col-lg-6">
+    <div class="ibox float-e-margins">
+      <div class="ibox-title">
+        <h5>Loans</h5>
+      </div>
+      <div class="ibox-content">
+          <button type="submit" [disabled]="disable()" (click)="importLoans()" class="btn btn-primary block full-width m-b">Start Import <waiting-backend *ngIf="waitingLoanCampaigns"></waiting-backend></button>
+          <p *ngIf="waitingLoanCampaigns">
+              <waiting-backend></waiting-backend>
+              Generating campaigns...
+          </p>
+        </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+      <div class="ibox float-e-margins">
+        <div class="ibox-title">
+          <h5>Deposits</h5>
+        </div>
+        <div class="ibox-content">
+            <button type="submit" [disabled]="disable()" (click)="importDeposits()" class="btn btn-primary block full-width m-b">Start Import <waiting-backend *ngIf="waitingDepositCampaigns"></waiting-backend></button>
+            <p *ngIf="waitingDepositCampaigns">
+                <waiting-backend></waiting-backend>
+                Generating campaigns...
+            </p>
+          </div>
+      </div>
+  </div>
+</div>
+
+
+
+

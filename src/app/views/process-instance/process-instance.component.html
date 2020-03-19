@@ -1,0 +1,177 @@
+<div class="ibox">
+  <div class="ibox-title">
+    <h3>Process instance for <strong>{{bpmCase.containerId}}/{{bpmCase.processInstanceId}}</strong></h3>
+    <span *ngIf="bpmCase.note && bpmCase.note != ''"><strong>Comment: </strong>{{ bpmCase.note }}</span>
+  </div>
+  <div class="ibox-content">
+    <h3>Status:
+      <span *ngIf="instanceStatus"
+            [ngClass]="{'complete-text': instanceStatus.processInstanceState == processStatesEnum.COMPLETE,
+            'aborted-text': instanceStatus.processInstanceState == processStatesEnum.ABORTED,
+            'active-text': instanceStatus.processInstanceState == processStatesEnum.ACTIVE}">
+        {{getProcessState()}}
+      </span>
+
+      <waiting-backend *ngIf="!instanceStatus"></waiting-backend>
+      <button *ngIf="instanceStatus && instanceStatus.processInstanceState == processStatesEnum.ACTIVE"
+              class="btn btn-xs btn-danger" style="margin-left: 20px; margin-bottom: 3px;"
+              (click)="openConfirmationModal()" [disabled]="areButtonsDisabled()"
+      >
+        Abort process
+        <waiting-backend *ngIf="waitingAbortResponse"></waiting-backend>
+      </button>
+    </h3>
+    <div style="margin-bottom: 20px">
+      <span *ngIf="instanceStatus && instanceStatus.processInstanceState == processStatesEnum.ABORTED && bpmCase.abortNote && bpmCase.abortNote != ''">
+        <strong>Abort comment: </strong>{{ bpmCase.abortNote }}
+      </span>
+    </div>
+
+    <h3  *ngIf="!instanceStatus || !instanceStatus.currentTask || instanceStatus.currentTask.length == 0 || !instanceStatus.currentTask[0].taskExpirationTime">
+      Current task
+    </h3>
+    <h3 *ngIf="instanceStatus && instanceStatus.currentTask && instanceStatus.currentTask.length > 0 && instanceStatus.currentTask[0].taskExpirationTime">
+      Due on: {{instanceStatus.currentTask[0].taskExpirationTime | coinDateTransform: "STD_DATE"}}
+    </h3>
+    <table class='table table-striped' *ngIf="instanceStatus && instanceStatus.currentTask && instanceStatus.currentTask.length > 0">
+      <tbody>
+      <!--For the moment, take only the first task-->
+      <tr *ngFor="let t of instanceStatus.currentTask">
+        <td style="width:80%;">
+          <i class="fas fa-tasks task-icon"></i><strong>{{t.taskName}}</strong>
+          <div *ngFor="let v of instanceStatus.inputVariables" class="col-lg-12" style="margin-top:15px">
+            <div class="col-lg-4" style="overflow: hidden; text-overflow: ellipsis">
+              <p class="notes" *ngIf="!v.isBoolean()">{{v.name}} </p>
+            </div>
+            <div class="col-lg-8">
+              <input [(ngModel)]="v.value" type="text" *ngIf="!v.isBoolean()"
+                     placeholder="{{ v.name}}" class="form-control"/>
+              <div *ngIf="v.isBoolean()" class="options-box">
+                <label *ngFor="let option of v.inputVariableOpts" class="radio-container">
+                  {{ option.name }}
+                  <input
+                    [(ngModel)]="v.value"
+                    type="radio"
+                    [value]="option.value"
+                    name="{{ option.name }}"
+                  />
+                  <span class="checkmark"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </td>
+        <td style="width:20%;">
+          <button (click)="completeTask(t, instanceStatus.inputVariables)" class="btn btn-xs btn-primary"
+                  [disabled]="!isCompleteTaskEnabled(instanceStatus.inputVariables) || searchingInputVariables"
+                  style="float: right">
+            Complete
+            <waiting-backend *ngIf="waitingCompleteTaskResponse"></waiting-backend>
+          </button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+    <p *ngIf="!instanceStatus || !instanceStatus.currentTask">
+      <waiting-backend></waiting-backend>
+      Searching current task...
+    </p>
+    <p *ngIf="instanceStatus && instanceStatus.currentTask && instanceStatus.currentTask.length == 0">
+      This process has not a current task
+    </p>
+    <p *ngIf="searchingInputVariables">
+      <waiting-backend></waiting-backend>
+      Searching input variables...
+    </p>
+
+    <h3>Available signals</h3>
+    <table class='table table-striped' *ngIf="instanceStatus && instanceStatus.signals && instanceStatus.signals.length > 0 && !searchingSignals">
+      <tbody>
+      <tr *ngFor="let s of instanceStatus.signals">
+        <td style="width:80%;">
+          <i class="fas fa-bolt event-icon"></i><strong>{{s}}</strong>
+        </td>
+        <td style="width:20%;">
+          <button (click)="signal(s)" class="btn btn-xs btn-primary" style="float: right"
+                  [disabled]="areButtonsDisabled()">
+            Signal
+            <waiting-backend *ngIf="waitingSignalResponse"></waiting-backend>
+          </button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+    <p *ngIf="searchingSignals">
+      <waiting-backend></waiting-backend>
+      Searching current task...
+    </p>
+    <p *ngIf="instanceStatus && instanceStatus.signals && instanceStatus.signals.length == 0 && !searchingSignals">
+      No signals available
+    </p>
+    <h3>History
+      <button class="btn btn-xs btn-info" style="margin-left: 20px; margin-bottom: 3px;"
+              (click)="openDiagramModal()" [disabled]="searchingDiagram"
+      >
+        Open model
+        <waiting-backend *ngIf="waitingAbortResponse"></waiting-backend>
+      </button>
+    </h3>
+    <div class="completed-tasks" *ngIf="instanceStatus && instanceStatus.historicTasks && instanceStatus.historicTasks.length > 0 && !searchingCompletedTasks">
+      <div class="feed-activity-list">
+        <div class="feed-element" *ngFor="let ct of instanceStatus.historicTasks">
+          <div>
+            <span class="pull-right" style="margin-right: 16px"><strong>{{ct.startDate | dateAgoTransform}}</strong> ({{ct.startDate | coinDateTransform}})</span>
+            <span>
+              <i *ngIf="taskType[ct.nodeType] == 'Task'" class="fas fa-tasks task-icon" title="{{taskType[ct.nodeType]}}"></i>
+              <i *ngIf="taskType[ct.nodeType] == 'Event'" class="fas fa-bolt event-icon" title="{{taskType[ct.nodeType]}}"></i>
+              <strong>{{ct.nodeName}}</strong>
+            </span>
+            <div *ngIf="ct.usedVariables && ct.usedVariables.length > 0" class="well" style="margin-top: 26px !important; width: 98%;">
+              <p><strong>Used parameters</strong></p>
+              <span *ngFor="let usedVar of ct.usedVariables">
+                <span *ngIf="!usedVar.isBoolean()">{{usedVar.name}}: </span><span>{{ usedVar.getFormatedValue() }}</span><br/>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p *ngIf="instanceStatus && instanceStatus.historicTasks && instanceStatus.historicTasks.length === 0 && !searchingCompletedTasks">
+      No complete tasks available
+    </p>
+    <p *ngIf="searchingCompletedTasks">
+      <waiting-backend></waiting-backend>
+      Searching completed tasks...
+    </p>
+  </div>
+</div>
+
+<confirmation-modal
+  #confirmationModal
+  [title]="'Abort process'"
+  [confirmationText]="'You are about to abort the process. This can\'t be undone. Are you sure?'"
+  [buttonText]="'Abort'"
+  [secondButtonText]="'Close'"
+  [hasNotes]="true"
+  (buttonFunction)="abortProcess($event.note)"
+></confirmation-modal>
+
+<diagram-modal
+  #diagramModal
+  [title]="'Process model'"
+  [svg]="svg"
+  [buttonText]="'Close'"
+></diagram-modal>
+
+<!--<div class="row">-->
+  <!--<div class="col-lg-12 col-xs-124">-->
+    <!--<div class="ibox">-->
+      <!--<div class="ibox-title">-->
+        <!--<h5>Process diagram</h5>-->
+      <!--</div>-->
+      <!--<div class="ibox-content">-->
+        <!--<div id="svgDiv" [innerHTML]="svg" style="overflow:hidden;"></div>-->
+      <!--</div>-->
+    <!--</div>-->
+  <!--</div>-->
+<!--</div>-->

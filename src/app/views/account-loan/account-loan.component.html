@@ -1,0 +1,42 @@
+<div class="row">
+  <div class="col-lg-6">
+    <dl class="dl-horizontal">
+      <dt>Collateral information:</dt>
+      <dd>{{accountLoan?.collateralInformation}}</dd>
+      <dt>Loan type:</dt>
+      <dd> {{accountLoan?.loanType}}</dd>
+      <dt>Current payoff:</dt>
+      <dd> {{accountLoan?.currentPayOff | coinCurrency}}</dd>
+      <dt>Loan term:</dt>
+      <dd> {{accountLoan?.loanTerm}}</dd>
+      <dt>LTV:</dt>
+      <dd> {{accountLoan?.ltv}}</dd>
+      <dt>Lien position:</dt>
+      <dd> {{accountLoan?.lienPosition}}</dd>
+      <dt>Partially paid:</dt>
+      <dd> {{accountLoan?.partiallyPaid}}</dd>
+      <dt>Officer:</dt>
+      <dd> {{accountLoan?.officer}}</dd>
+    </dl>
+  </div>
+  <div class="col-lg-6">
+    <dl class="dl-horizontal">
+      <dt>Current balance:</dt>
+      <dd> {{accountLoan?.currentBalance | coinCurrency}}</dd>
+      <dt>Loan date:</dt>
+      <dd> {{accountLoan?.loanDate | coinDateTransform: "STD_DATE":"MM/DD/YYYY hh:mm:ss A"}}</dd>
+      <dt>Rate:</dt>
+      <dd> {{accountLoan?.rate}}</dd>
+      <dt>Appraised amount:</dt>
+      <dd> {{accountLoan?.appraisedAmount | coinCurrency}}</dd>
+      <dt>Updated appraisal:</dt>
+      <dd> {{accountLoan?.updatedAppraisal}}</dd>
+      <dt>Maturity date:</dt>
+      <dd> {{accountLoan?.maturityDate | coinDateTransform: "STD_DATE"}}</dd>
+      <dt>Renewal date:</dt>
+      <dd> {{accountLoan?.renewalDate}}</dd>
+      <dt>TDR:</dt>
+      <dd> {{accountLoan?.termDeposit}}</dd>
+    </dl>
+  </div>
+</div>

@@ -1,0 +1,32 @@
+.col-padding {
+  padding: 10px !important;
+}
+
+.white {
+  background-color: white;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.blue, .blue:focus, .blue:hover {
+  background-color:#1c84c6;
+  color: white;
+}
+
+.strong {
+  font-weight: bold;
+}
+
+.modal-body {
+  padding: 20px 30px;
+}
+
+.modal-footer {
+  padding-top: 0;
+}
+
+dt, dd {
+  padding: 1px 0;
+}

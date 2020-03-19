@@ -1,0 +1,38 @@
+.option-icons {
+  cursor: pointer;
+  float: right;
+}
+
+.option-icons.edit:hover:not(.disabled) {
+  color: orange;
+}
+
+.option-icons.save {
+  padding-right: 7px;
+}
+
+.option-icons.disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+.option-icons.close.disabled {
+  opacity: .2 !important;
+}
+
+.option-icons.save:hover:not(.disabled) {
+  color: #1c84c6;
+}
+
+.option-icons.close {
+  opacity: .6;
+  font-size: 14px;
+}
+
+.option-icons.close:hover:not(.disabled) {
+  color: #ed000b;
+}
+
+.table > tbody > tr > td {
+  vertical-align: middle;
+}

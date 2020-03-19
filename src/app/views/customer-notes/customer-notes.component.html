@@ -1,0 +1,36 @@
+<div *ngIf="notes && notes.length > 0">
+  <div class='table-responsive'>
+    <table class='table table-striped'>
+      <thead>
+      <tr>
+        <th style="width: 80%">Message</th>
+        <th style="width: 20%"><i class="fa fa-calendar"></i> Date</th>
+        <th *ngIf="isEditable"></th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let note of notes; let idx = index">
+        <td>
+          <span *ngIf="rowInEdition != idx">{{note.message}}</span>
+          <input *ngIf="rowInEdition == idx" type="text" [(ngModel)]="auxiliarMsg" class="form-control" [disabled]="isSaving">
+        </td>
+        <td>{{note.startDate | coinDateTransform:"STD_DATE":"MM/DD/YYYY hh:mm A"}}</td>
+        <td *ngIf="isEditable">
+          <i *ngIf="rowInEdition != idx" class="option-icons edit fas fa-edit" (click)="toggleEdit(idx, note.message)" [class.disabled]="isSaving"></i>
+          <div *ngIf="rowInEdition == idx" style="display: flex">
+            <i *ngIf="!isSaving"
+               class="option-icons save fas fa-save"
+               (click)="saveCustomerMessage(note)"
+               [class.disabled]="!canSave(note.message)"
+            ></i>
+            <div *ngIf="isSaving"><waiting-backend></waiting-backend></div>
+            <i class="option-icons close fa fa-close fa-fw" (click)="toggleEdit()" [class.disabled]="isSaving"></i>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div *ngIf="searching"><waiting-backend></waiting-backend> Searching...</div>
+<div *ngIf="notes?.length == 0">No data found.</div>

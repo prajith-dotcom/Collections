@@ -1,0 +1,85 @@
+<div *ngFor="let customer of customers; let last=last;">
+  <div class="row">
+    <div class="col-lg-6">
+      <dl class="dl-horizontal">
+        <dt>Name <i class="fa fa-male"></i> :</dt>
+        <dd><strong><span>{{customer?.mainContact?.completeName}}</span></strong></dd>
+        <dt><span class="label label-warning pull-right">Brw SSN</span></dt>
+        <dd>{{customer?.taxId}}</dd>
+        <div *ngIf="isExtraInfoVisible(customer)">
+          <dt><span class="label label-info pull-right">CIF No</span></dt>
+          <dd>{{customer?.cifNo}}</dd>
+          <dt><span>Birth date :</span></dt>
+          <dd>{{customer?.birthDate}}</dd>
+        </div>
+      </dl>
+    </div>
+    <div class="col-lg-6">
+      <dl class="dl-horizontal">
+        <dt>Address <i class="fa fa-address-card-o" aria-hidden="true"></i> :</dt>
+        <dd [class.green]="customer?.hasValidAddressVerification()"
+            [class.orange]="customer?.addressIsModifying()"
+            [class.red]="customer?.needsAddressVerification()"
+        >{{customer?.mainAddress?.streetAddress1}}</dd>
+        <dt *ngIf="customer?.mainAddress?.streetAddress2"><i class="fa fa-address-card-o" aria-hidden="true"></i> :</dt>
+        <dd *ngIf="customer?.mainAddress?.streetAddress2"
+            [class.green]="customer?.hasValidAddressVerification()"
+            [class.orange]="customer?.addressIsModifying()"
+            [class.red]="customer?.needsAddressVerification()"
+        >{{customer?.mainAddress?.streetAddress2}}</dd>
+        <dt *ngIf="customer?.mainAddress?.streetAddress3"><i class="fa fa-address-card-o" aria-hidden="true"></i> :</dt>
+        <dd *ngIf="customer?.mainAddress?.streetAddress3"
+            [class.green]="customer?.hasValidAddressVerification()"
+            [class.orange]="customer?.addressIsModifying()"
+            [class.red]="customer?.needsAddressVerification()"
+        >{{customer?.mainAddress?.streetAddress3}}</dd>
+        <dt><i class="fa fa-address-card-o" aria-hidden="true"></i> :</dt>
+        <dd [class.green]="customer?.hasValidAddressVerification()"
+            [class.orange]="customer?.addressIsModifying()"
+            [class.red]="customer?.needsAddressVerification()"
+        >{{customer?.mainAddress?.city}} {{customer?.mainAddress?.stateCode}} {{customer?.mainAddress?.postalCode}}</dd>
+
+        <!--button get phone-->
+        <dt *ngIf="!isExtraInfoVisible(customer)"><button class="btn btn-xs btn-primary phone" (click)="openExtraInfoCustomer(customer)">Get additional information</button></dt>
+        <!--when click: show the contact information-->
+        <div *ngIf="isExtraInfoVisible(customer)">
+          <div *ngFor="let ph of customer?.phones">
+            <a *ngIf="ph.isLandline()" (click)="call(ph)">
+            <dt><span *ngIf="customer.phones">{{ph | telephoneType}} <i class="fa fa-phone"></i> :</span></dt>
+              <dd *ngIf="ph.number"
+                  [class.green]="customer?.hasValidPhoneVerification()"
+                  [class.orange]="customer?.phoneIsModifying()"
+                  [class.red]="customer?.needsPhoneVerification()"
+              ><strong>{{ph | telephoneNumber }}</strong></dd>
+              <dd *ngIf="!ph.number" class="grey">Not phone found.</dd>
+            </a>
+
+            <div *ngIf="!ph.isLandline()">
+              <dt>{{ph | telephoneType}} <i class="fas fa-mobile-alt"></i> :</dt>
+              <dd [class.green]="customer?.hasValidPhoneVerification()"
+                  [class.orange]="customer?.phoneIsModifying()"
+                  [class.red]="customer?.needsPhoneVerification()"
+              >{{ph | telephoneNumber }}</dd>
+            </div>
+          </div>
+
+          <div *ngFor="let email of customer?.emails; let ind = index;">
+            <div>
+              <dt><span *ngIf="ind == 0">eMail </span><i class="fas fa-envelope"></i> :</dt>
+              <dd class="overflowMail">
+                <a class="overflowMail"
+                   [class.green]="customer?.hasValidEmailVerification()"
+                   [class.orange]="customer?.emailIsModifying()"
+                   [class.red]="customer?.needsEmailVerification()"
+                   href="mailto:{{email}}" target="_top">{{ email }}</a>
+              </dd>
+            </div>
+          </div>
+        </div>
+      </dl>
+    </div>
+  </div>
+  <div *ngIf="!last" class="hr-line-dashed"></div>
+</div>
+<div *ngIf="customers?.length == 0">No co-borrowers found.</div>
+<div *ngIf="searching"><waiting-backend></waiting-backend> Searching...</div>
